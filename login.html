@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login - Pink Blossom</title>
+  <title>Pink Blossom</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,17 +15,31 @@
       justify-content: center;
       align-items: center;
     }
-    .login-container {
+    .login-container, .index-container {
       background: #fff0f6;
       padding: 3rem 2.5rem;
       border-radius: 20px;
       width: 350px;
-      box-shadow: 0 15px 30px rgba(244, 143, 177,0.25);
+      box-shadow: 0 15px 30px rgba(244, 143, 177, 0.25);
       text-align: center;
+      display: none;
     }
-    h2 { color: #d81b60; font-weight: 600; margin-bottom: 1rem; }
-    p { color: #ad1457; margin-bottom: 2rem; }
-    .form-group { margin-bottom: 1.5rem; text-align: left; }
+    .login-container.active, .index-container.active {
+      display: block;
+    }
+    h2, h1 {
+      color: #d81b60;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    p {
+      color: #ad1457;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
     label {
       display: block;
       margin-bottom: 0.5rem;
@@ -55,10 +69,12 @@
       border-radius: 15px;
       cursor: pointer;
       font-weight: 600;
-      box-shadow: 0 6px 12px rgba(216, 27, 96,0.5);
+      box-shadow: 0 6px 12px rgba(216, 27, 96, 0.5);
       transition: background-color 0.3s ease;
     }
-    button:hover { background: #ad1457; }
+    button:hover {
+      background: #ad1457;
+    }
     .forgot-password {
       margin-top: 1rem;
       font-size: 0.85rem;
@@ -66,7 +82,19 @@
       cursor: pointer;
       text-decoration: underline;
     }
-    .forgot-password:hover { color: #8e24aa; }
+    .forgot-password:hover {
+      color: #8e24aa;
+    }
+    .logout-btn {
+      margin-top: 2rem;
+      color: #ba68c8;
+      text-decoration: underline;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .logout-btn:hover {
+      color: #8e24aa;
+    }
     #loginStatus {
       margin-top: 12px;
       font-size: 0.9rem;
@@ -75,7 +103,8 @@
   </style>
 </head>
 <body>
-  <div class="login-container">
+  <!-- Login Section -->
+  <div class="login-container active" id="loginSection">
     <h2>Welcome Back</h2>
     <p>Sign in to continue to Pink Blossom</p>
     <form id="loginForm">
@@ -89,16 +118,40 @@
       </div>
       <button type="submit">Log In</button>
     </form>
-    <div class="forgot-password" onclick="alert('Password reset not implemented.')">Forgot Password?</div>
+    <div class="forgot-password" onclick="alert('Password reset not available yet.')">Forgot Password?</div>
     <div id="loginStatus" role="alert" aria-live="polite"></div>
   </div>
 
+  <!-- Index/Home Section -->
+  <div class="index-container" id="indexSection">
+    <h1 id="welcomeUser">Welcome! 🌸</h1>
+    <p>You are now logged in to Pink Blossom.</p>
+    <div class="logout-btn" onclick="logout()">Log out</div>
+  </div>
+
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const loginSection = document.getElementById('loginSection');
+    const indexSection = document.getElementById('indexSection');
+    const welcomeUser = document.getElementById('welcomeUser');
+    const loginForm = document.getElementById('loginForm');
+    const loginStatus = document.getElementById('loginStatus');
+
+    function showIndex(username) {
+      loginSection.classList.remove('active');
+      indexSection.classList.add('active');
+      welcomeUser.textContent = `Welcome, ${username}! 🌸`;
+    }
+
+    function logout() {
+      localStorage.removeItem('loggedInUser');
+      indexSection.classList.remove('active');
+      loginSection.classList.add('active');
+    }
+
+    loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-      const loginStatus = document.getElementById('loginStatus');
 
       if (!username || !password) {
         loginStatus.style.color = '#c62828';
@@ -106,17 +159,22 @@
         return;
       }
 
-      // Simulate successful login
       loginStatus.style.color = '#4a148c';
       loginStatus.textContent = 'Logging in...';
 
-      // Optionally save username to localStorage
       localStorage.setItem('loggedInUser', username);
 
       setTimeout(() => {
-        window.location.href = 'index.html';
+        loginStatus.textContent = '';
+        showIndex(username);
       }, 1000);
     });
+
+    // Check if already logged in
+    const storedUser = localStorage.getItem('loggedInUser');
+    if (storedUser) {
+      showIndex(storedUser);
+    }
   </script>
 </body>
 </html>
